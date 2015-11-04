@@ -12,29 +12,45 @@ import os.path
 
 def parser(grammar_filename, sentence):
 	"""
-	parser() xx.
+	parser() takes a sentence and parses it according to the given grammar.
 
-	@params: xx.
-	@return: xx.
+	@params: filename where grammar is recorded,
+			 sentence to be parsed.
+	@return: n/a.
 	"""
 	grammar = getGrammar(grammar_filename)
 
-	parse_tree = cky(grammar, sentence)
+	backpointer_lst = cky(grammar, sentence)
 
-	printParseTree(parse_tree)
+	printParseTree(backpointer_lst)
 
 def cky(grammar, sentence):
 	"""
-	ckY() xx
+	ckY() takes sentence and parses it according to the provided grammar.
 
-	@parmas: xx
-	@return: xx
+	@parmas: grammar (dictionary),
+			 sentence (string).
+	@return: table (results from the algorithm),
+			 backpointers for the solution.
 	"""
-	# Code
+	n = len(sentence)
+	# Should we make this a dictionary? --> less memory.
+	table = [[None for i in range(n)] for j in range(n)]
+	# Should we make this a dictionary? --> less memory.
+	backpointers = [[[] for i in range(n)] for j in range(n)]
 
-	return None
+	for j in range(1, len(sentence)):
+		# table[j - 1][j] += {A if A -> words[j] \in gram}
+		# Does this actually work or do we need an 'if'?
+		for i in range(j - 2, 0):
+			for k in range(i + 1, j - 1):
+				# table[i][j] += {A if A -> B C \in gram,
+				# 				  B \in table[i][k]
+				#				  C \in table[k][j]}
 
-def printParseTree(parse_tree):
+	return backpointers[0][n - 1]
+
+def printParseTree(parse_tree, backpointers):
 	"""
 	printParseTree() takes a parse tree and prints it out.
 
