@@ -25,7 +25,9 @@ def parser(grammar_filename, sentence):
 
 def getGrammar(grammar_filename):
 	"""
-	getGrammar() xx.
+	getGrammar() takes the filename of the file where our grammar rules are
+	listed and reads these rules into a dictionary. The dictionary with the
+	rules recorded is returned.
 	
 	Rules:
 	- Lines beginning with # are comments.
@@ -33,8 +35,8 @@ def getGrammar(grammar_filename):
 	- Strings beginning with an uppercase letter are nonterminals.
 	- Strings beginning with a lowercase letter are terminals.
 
-	@params: xx.
-	@return: xx.
+	@params: filename of file where the grammar rules are listed.
+	@return: dictionary w/ grammar rules.
 	"""
 	try:
 		grammar_text = open(sys.argv[1], 'r')
@@ -61,6 +63,9 @@ def getGrammar(grammar_filename):
 			right_side = rule[1].split()
 			if len(right_side) > 2:
 				printError(1)
+			left_side = rule[0].split()
+			if len(left_side) != 1:
+				printError(1)
 
 			# If we have seen a derivation before, we add it to the list.
 			if rule[0] in grammar:
@@ -75,9 +80,21 @@ def getGrammar(grammar_filename):
 
 	return grammar
 
-# printError
-	# 0 --> normal error
-	# 1 --> grammar file
+def printError(num):
+	"""
+	printError() prints out an error message and exits the program.
+
+	@params: number that tells us where the error is coming from.
+				0 --> general error.
+				1 --> grammar file.
+	@return: n/a.
+	"""
+	if num == 0:
+		print('Error in the grammar file provided.')
+	else:
+		print('Error.')
+
+	print('Usage: $ python3 parser.py <filename for grammar> <sentence>')
 
 def main():
 	if len(sys.argv) != 3:
