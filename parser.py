@@ -44,6 +44,8 @@ def getGrammar(grammar_filename):
 		printError()
 
 	grammar = {}
+	# Loops over each line in the grammar file we were given to record the
+	# grammar rules.
 	for line in grammar_text:
 		# We do not want to read the comments.
 		if line[0] != '#':
@@ -56,15 +58,22 @@ def getGrammar(grammar_filename):
 			rule[1] = rule[1].strip()
 
 			# Makes sure the grammar is of the proper form.
-			right = rule[1].split()
-			if len(right) > 2:
+			right_side = rule[1].split()
+			if len(right_side) > 2:
 				printError(1)
 
-			Xx
+			# If we have seen a derivation before, we add it to the list.
+			if rule[0] in grammar:
+				if right_side in grammar[rule[0]]:
+					printError(1)
+				else:
+					grammar[rule[0]] = grammar[rule[0]].append(right_side)
+			# If we have not seen a derivation before we need to add it to
+			# the dictionary.
+			else:
+				grammar[rule[0]] = [right_side]
 
-	# Code.
-
-	return None
+	return grammar
 
 # printError
 	# 0 --> normal error
