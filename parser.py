@@ -19,9 +19,29 @@ def parser(grammar_filename, sentence):
 	"""
 	grammar = getGrammar(grammar_filename)
 
-	# Code.
+	parse_tree = cky(grammar, sentence)
+
+	printParseTree(parse_tree)
+
+def cky(grammar, sentence):
+	"""
+	ckY() xx
+
+	@parmas: xx
+	@return: xx
+	"""
+	# Code
 
 	return None
+
+def printParseTree(parse_tree):
+	"""
+	printParseTree() takes a parse tree and prints it out.
+
+	@params: parse tree (embeded lists)
+	@return: n/a.
+	"""
+	# Code
 
 def getGrammar(grammar_filename):
 	"""
@@ -63,8 +83,11 @@ def getGrammar(grammar_filename):
 			right_side = rule[1].split()
 			if len(right_side) > 2:
 				printError(1)
+
 			left_side = rule[0].split()
 			if len(left_side) != 1:
+				printError(1)
+			elif left_side[0][0] != left_side[0][0].higher():
 				printError(1)
 
 			# If we have seen a derivation before, we add it to the list.
@@ -89,7 +112,7 @@ def printError(num):
 				1 --> grammar file.
 	@return: n/a.
 	"""
-	if num == 0:
+	if num == 1:
 		print('Error in the grammar file provided.')
 	else:
 		print('Error.')
