@@ -38,68 +38,45 @@ def cky(grammar, sentence):
 	# Should we make this a dictionary? --> less memory.
 	table = [[[] for i in range(n + 1)] for j in range(n + 1)]
 	# Should we make this a dictionary? --> less memory.
-	backpointers = [[[] for i in range(n + 1)] for j in range(n + 1)]
+	backpointers = [[{} for i in range(n + 1)] for j in range(n + 1)]
 
 	for j in range(1, n + 1):
 		# table[j - 1][j] += {A if A -> words[j] \in gram}
-		# print(sentence[j - 1])
 		for rule in grammar:
-			# print(rule)
-			# print(grammar[rule])
-			# print(sentence[j - 1])
 			if [sentence[j - 1]] in grammar[rule]:
-				# print('entererd')
-				# print(j)
 				table[j - 1][j].append(rule)
-
-		# print(table)
-		# sys.exit()
+				backpointers[j - 1][j][rule] = [rule, sentence[j - 1]]
 
 		# Does this actually work or do we need an 'if'?
 		for i in reversed(range(0, j - 1)): #(j - 2, 1) goes to 0
-			# print(i)
-			# print(j)
-			# print()
 			for k in range(i + 1, j): # goes to j - 1
 				# table[i][j] += {A if A -> B C \in gram,
 				# 				  B \in table[i][k]
 				#				  C \in table[k][j]}
-
-				# print(i)
-				# print(k)
-				# print(n)
-				# print()
-
 				for rule in grammar:
-					# print()
-					# print(rule)
-					# print()
 					for derivation in grammar[rule]:
-						# print(derivation)
-						# print()
 						if len(derivation) == 2:
 							B = derivation[0]
 							C = derivation[1]
-							# print(rule)
-							# print(derivation)
-							# print(B)
-							# print(C)
-							# print(table[i][k])
-							# print(table[k][j])
 
 							if B in table[i][k] and C in table[k][j]:
-								print('entered')
-								print(rule)
-								print(B)
-								print(C)
-								if i == 0 and j == n:
-									print('ypupyupupupup')
-								print()
 								table[i][j].append(rule)
-							# print()
+								if rule in backpointers[i][j]:
+									pass # Do nothing.
+									# backpointers[i][j][rule].append(1)
+								else:
+									backpointers[i][j][rule] = \
+										[rule, backpointers[i][k][B], \
+										 backpointers[k][j][C]]
+
 	
 	print(table)
+	print()
 	print(table[0][n])
+	print()
+	print(backpointers)
+	print()
+	print(backpointers[0][n])
 	sys.exit()
 	return backpointers[0][n]
 
@@ -130,7 +107,6 @@ def getGrammar(grammar_filename):
 	"""
 	try:
 		grammar_text = open(sys.argv[1], 'r')
-
 	except: #Exception,e:
 		# print e
 		printError()
@@ -165,18 +141,11 @@ def getGrammar(grammar_filename):
 				if right_side in grammar[rule[0]]:
 					printError(1)
 				else:
-					# print('OTHER')
-					# print(grammar[rule[0]])
-					# print(right_side)
 					grammar[rule[0]].append(right_side)
 			# If we have not seen a derivation before we need to add it to
 			# the dictionary.
 			else:
-				# print('RIGHT SIDE')
-				# print(right_side)
 				grammar[rule[0]] = [right_side]
-
-		# print(grammar)
 
 	# print(grammar)
 	# sys.exit()
