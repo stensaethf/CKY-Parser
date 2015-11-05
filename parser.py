@@ -15,17 +15,16 @@ class Node:
 	Node xx
 	"""
 
-	def __init__(self, root, left, right, terminal):
+	def __init__(self, root, left, right, end):
 		"""
 		"""
 		self.root = root
 		self.left = left
 		self.right = right
-		self.terminal = terminal
-		if terminal == None:
+		self.terminal = end
+		self.status = True
+		if end == None:
 			self.status = False
-		else:
-			self.status = True
 
 	# def __init__(self, root, terminal):
 	# 	"""
@@ -71,9 +70,13 @@ def parser(grammar_filename, sentence):
 	"""
 	grammar = getGrammar(grammar_filename)
 
-	backpointer_lst = cky(grammar, sentence.split())
+	# backpointer_lst = cky(grammar, sentence.split())
 
-	printParseTree(backpointer_lst)
+	# printParseTree(backpointer_lst)
+
+	nodes_back = cky(grammar, sentence.split())
+
+	printParseTrees(nodes_back)
 
 def cky(grammar, sentence):
 	"""
@@ -139,24 +142,54 @@ def cky(grammar, sentence):
 	for node in nodes_back[0][n]:
 		print(node.getRoot())
 	# sys.exit()
-	return backpointers[0][n]
+	# return backpointers[0][n]
+	return nodes_back[0][n]
 
-def printParseTree(backpointer_dict):
+def printParseTrees(nodes_back):
 	"""
-	printParseTree() takes a parse tree in the form of a list of backpoitners
-	and prints it out.
+	"""
+	check = False
+	for node in nodes_back:
+		if node.getRoot() == 'S':
+			print(printParseTree(node, 3))
+			print()
+			check = True
 
-	@params: backpointers (dictionary of multiple lists).
-	@return: n/a.
+	if not check:
+		print('The given sentence is not valid according to the grammar.')
+
+def printParseTree(root, indent):
 	"""
-	if 'S' not in backpointer_dict:
-		print('The given sentence was not valid according to the grammar.')
-	else:
-		S = backpointer_dict['S']
-		# print(len(S))
-		# result = '(S ' + constructSubTree(S[1], 5 + len(S[1][0])) + '\n' \
-		# 		 + ' '*3 + constructSubTree(S[2], 5 + len(S[2][0])) + ')'
-		print(constructSubTree(S, 3))
+	"""
+	# print(root)
+	# print(root.getRoot())
+	# print(root.status)
+	if root.status:
+		return '(' + root.root + ' ' + root.terminal + ')'
+
+	new1 = indent + 2 + len(root.left.root) #len(tree[1][0])
+	new2 = indent + 2 + len(root.right.root) #len(tree[2][0])
+	left = printParseTree(root.left, new1)
+	right = printParseTree(root.right, new2)
+	return '(' + root.root + ' ' + left + '\n' \
+			+ ' '*indent + right + ')'
+
+# def printParseTree(backpointer_dict):
+# 	"""
+# 	printParseTree() takes a parse tree in the form of a list of backpoitners
+# 	and prints it out.
+
+# 	@params: backpointers (dictionary of multiple lists).
+# 	@return: n/a.
+# 	"""
+# 	if 'S' not in backpointer_dict:
+# 		print('The given sentence was not valid according to the grammar.')
+# 	else:
+# 		S = backpointer_dict['S']
+# 		# print(len(S))
+# 		# result = '(S ' + constructSubTree(S[1], 5 + len(S[1][0])) + '\n' \
+# 		# 		 + ' '*3 + constructSubTree(S[2], 5 + len(S[2][0])) + ')'
+# 		print(constructSubTree(S, 3))
 
 def constructSubTree(tree, indent):
 	"""
