@@ -76,19 +76,48 @@ def cky(grammar, sentence):
 	print()
 	print(backpointers)
 	print()
-	print(backpointers[0][n])
-	sys.exit()
+	print(backpointers[0][n]['S'])
+	# sys.exit()
 	return backpointers[0][n]
 
-def printParseTree(backpointers):
+def printParseTree(backpointer_dict):
 	"""
 	printParseTree() takes a parse tree in the form of a list of backpoitners
 	and prints it out.
 
-	@params: backpointers (list of multiple lists).
+	@params: backpointers (dictionary of multiple lists).
 	@return: n/a.
 	"""
-	# Code
+	if 'S' not in backpointer_dict:
+		print('The given sentence was not valid according to the grammar.')
+	else:
+		S = backpointer_dict['S']
+		print(len(S))
+		result = '(S ' + constructSubTree(S[1], 5 + len(S[1][0])) + '\n' \
+				 + ' '*3 + constructSubTree(S[2], 5 + len(S[2][0])) + ')'
+		print(result)
+
+def constructSubTree(tree, indent):
+	"""
+	"""
+	result = ''
+	if len(tree) == 2:
+		if tree[1] == tree[1].lower():
+			# Terminal value was reached
+			result = '(' + tree[0] + ' ' + tree[1] + ')'
+		else:
+			# Nonterminal to single nonterminal
+			result = '(' + tree[0] + ' ' + constructSubTree(tree[1]) + ')'
+	else:
+		# print(tree[0])
+		# print(len(tree[0]))
+		# print(indent)
+		new1 = indent + 2 + len(tree[1][0])
+		new2 = indent + 2 + len(tree[2][0])
+		result = '(' + tree[0] + ' ' + constructSubTree(tree[1], new1) \
+				 + '\n' + ' '*indent + constructSubTree(tree[2], new2) + ')'
+
+	return result
 
 def getGrammar(grammar_filename):
 	"""
