@@ -12,53 +12,80 @@ import os.path
 
 class Node:
 	"""
-	Node xx
+	The Node clas functions as a way to construct a tree using nodes that have
+	children.
+
+	Methods:
+	- root
+	- left
+	- right
+	- status
+	- terminal
 	"""
 
 	def __init__(self, root, left, right, end):
 		"""
+		Constructor for the Node class. Root, left, right, terminal and status
+		are set up here. Status is infered from whether a terminal value is
+		provided or not.
 		"""
-		self.root = root
-		self.left = left
-		self.right = right
-		self.terminal = end
-		self.status = True
+		self._root = root
+		self._left = left
+		self._right = right
+		self._terminal = end
+		self._status = True
 		if end == None:
-			self.status = False
+			self._status = False
 
-	# def __init__(self, root, terminal):
-	# 	"""
-	# 	"""
-	# 	self.root = root
-	# 	self.left = None
-	# 	self.right = None
-	# 	self.terminal = terminal
-	# 	self.status = True
+	@property
+	def root(self):
+		"""
+		root allows the user to get the root of the node.
 
-	def getRoot(self):
+		@params: n/a.
+		@return: the root.
 		"""
-		"""
-		return self.root
+		return self._root
 
-	def getLeft(self):
+	@property
+	def left(self):
 		"""
-		"""
-		return self.left
+		left allows the user to get the left subtree of the node.
 
-	def getRight(self):
+		@params: n/a.
+		@return: the left subtree.
 		"""
-		"""
-		return self.right
+		return self._left
 
-	def isTerminal(self):
+	@property
+	def right(self):
 		"""
-		"""
-		return self.status
+		right allows the user to get the right subtree of the node.
 
-	def getTerminal(self):
+		@params: n/a.
+		@return: the right subtree.
 		"""
+		return self._right
+
+	@property
+	def status(self):
 		"""
-		return self.terminal
+		status allows the user to get the status of the node.
+
+		@params: n/a.
+		@return: boolean for whether it is a terminal node or not.
+		"""
+		return self._status
+
+	@property
+	def terminal(self):
+		"""
+		terminal allows the user to get the terminal value of the node.
+
+		@params: n/a.
+		@return: the terminal value.
+		"""
+		return self._terminal
 
 def parser(grammar_filename, sentence):
 	"""
@@ -69,10 +96,6 @@ def parser(grammar_filename, sentence):
 	@return: n/a.
 	"""
 	grammar = getGrammar(grammar_filename)
-
-	# backpointer_lst = cky(grammar, sentence.split())
-
-	# printParseTree(backpointer_lst)
 
 	nodes_back = cky(grammar, sentence.split())
 
@@ -85,14 +108,12 @@ def cky(grammar, sentence):
 	@parmas: grammar (dictionary),
 			 sentence (list of strings).
 	@return: table (results from the algorithm),
-			 backpointers for the solution.
+			 list of root nodes for the solutions.
 	"""
 	n = len(sentence)
-	print(sentence)
 	# Should we make this a dictionary? --> less memory.
 	table = [[[] for i in range(n + 1)] for j in range(n + 1)]
 	# Should we make this a dictionary? --> less memory.
-	backpointers = [[{} for i in range(n + 1)] for j in range(n + 1)]
 	nodes_back = [[[] for i in range(n + 1)] for j in range(n + 1)]
 
 	for j in range(1, n + 1):
@@ -100,8 +121,8 @@ def cky(grammar, sentence):
 		for rule in grammar:
 			if [sentence[j - 1]] in grammar[rule]:
 				table[j - 1][j].append(rule)
-				backpointers[j - 1][j][rule] = [rule, sentence[j - 1]]
-				nodes_back[j - 1][j].append(Node(rule, None, None, sentence[j - 1]))
+				nodes_back[j - 1][j].append(
+					Node(rule, None, None, sentence[j - 1]))
 
 		# Does this actually work or do we need an 'if'?
 		for i in reversed(range(0, j - 1)): #(j - 2, 1) goes to 0
@@ -117,108 +138,52 @@ def cky(grammar, sentence):
 
 							if B in table[i][k] and C in table[k][j]:
 								table[i][j].append(rule)
-								if rule in backpointers[i][j]:
-									pass # Do nothing.
-									# backpointers[i][j][rule].append(1)
-								else:
-									backpointers[i][j][rule] = \
-										[rule, backpointers[i][k][B], \
-										 backpointers[k][j][C]]
 
 								for b in nodes_back[i][k]:
 									for c in nodes_back[k][j]:
-										if b.getRoot() == B and c.getRoot() == C:
-											nodes_back[i][j].append(Node(rule, b, c, None))
+										if b.root == B and \
+										   c.root == C:
+											nodes_back[i][j].append(
+												Node(rule, b, c, None))
 
-	
-	# print(table)
-	# print()
-	# print(table[0][n])
-	# print()
-	print(backpointers)
-	print()
-	print(backpointers[0][n]['S'])
-	print(nodes_back[0][n])
-	for node in nodes_back[0][n]:
-		print(node.getRoot())
-	# sys.exit()
-	# return backpointers[0][n]
 	return nodes_back[0][n]
 
 def printParseTrees(nodes_back):
 	"""
+	printParseTrees() takes a list of root nodes and prints the ones that
+	start with an 'S'.
+
+	@params: list of nodes.
+	@return: n/a.
 	"""
 	check = False
 	for node in nodes_back:
-		if node.getRoot() == 'S':
-			print(printParseTree(node, 3))
+		if node.root == 'S':
+			print(getParseTree(node, 3))
 			print()
 			check = True
 
 	if not check:
 		print('The given sentence is not valid according to the grammar.')
 
-def printParseTree(root, indent):
+def getParseTree(root, indent):
 	"""
+	getParseTree() takes a root and constructs the tree in the form of a
+	string. Right and left subtrees are indented equally, providing for
+	a nice display.
+
+	@params: root node and an indent factor (int).
+	@return: tree, starting at the root provided, in the form of a string.
 	"""
-	# print(root)
-	# print(root.getRoot())
-	# print(root.status)
 	if root.status:
 		return '(' + root.root + ' ' + root.terminal + ')'
 
 	new1 = indent + 2 + len(root.left.root) #len(tree[1][0])
 	new2 = indent + 2 + len(root.right.root) #len(tree[2][0])
-	left = printParseTree(root.left, new1)
-	right = printParseTree(root.right, new2)
+	left = getParseTree(root.left, new1)
+	right = getParseTree(root.right, new2)
 	return '(' + root.root + ' ' + left + '\n' \
 			+ ' '*indent + right + ')'
-
-# def printParseTree(backpointer_dict):
-# 	"""
-# 	printParseTree() takes a parse tree in the form of a list of backpoitners
-# 	and prints it out.
-
-# 	@params: backpointers (dictionary of multiple lists).
-# 	@return: n/a.
-# 	"""
-# 	if 'S' not in backpointer_dict:
-# 		print('The given sentence was not valid according to the grammar.')
-# 	else:
-# 		S = backpointer_dict['S']
-# 		# print(len(S))
-# 		# result = '(S ' + constructSubTree(S[1], 5 + len(S[1][0])) + '\n' \
-# 		# 		 + ' '*3 + constructSubTree(S[2], 5 + len(S[2][0])) + ')'
-# 		print(constructSubTree(S, 3))
-
-def constructSubTree(tree, indent):
-	"""
-	constructSubTree() takes a tree and constructs the sub trees of that
-	tree. The result is a string that can be printed out to nicely show what
-	the tree looks like.
-
-	@params: a tree (root or root and subtrees) and a number to indent by.
-	@return: sub tree in the form of a string.
-	"""
-	result = ''
-	if len(tree) == 2:
-		if tree[1] == tree[1].lower():
-			# Terminal value was reached
-			result = '(' + tree[0] + ' ' + tree[1] + ')'
-		else:
-			# Nonterminal to single nonterminal
-			new = indent + 2 + len(tree[1][0])
-			result = '(' + tree[0] + ' ' + constructSubTree(tree[1], new) + ')'
-	else:
-		# print(tree[0])
-		# print(len(tree[0]))
-		# print(indent)
-		new1 = indent + 2 + len(tree[1][0])
-		new2 = indent + 2 + len(tree[2][0])
-		result = '(' + tree[0] + ' ' + constructSubTree(tree[1], new1) \
-				 + '\n' + ' '*indent + constructSubTree(tree[2], new2) + ')'
-
-	return result
 
 def getGrammar(grammar_filename):
 	"""
@@ -276,9 +241,6 @@ def getGrammar(grammar_filename):
 			# the dictionary.
 			else:
 				grammar[rule[0]] = [right_side]
-
-	# print(grammar)
-	# sys.exit()
 
 	return grammar
 
