@@ -10,6 +10,57 @@ given a CFG (in almost-CNF) and a sentence.
 import sys
 import os.path
 
+class Node:
+	"""
+	Node xx
+	"""
+
+	def __init__(self, root, left, right, terminal):
+		"""
+		"""
+		self.root = root
+		self.left = left
+		self.right = right
+		self.terminal = terminal
+		if terminal == None:
+			self.status = False
+		else:
+			self.status = True
+
+	# def __init__(self, root, terminal):
+	# 	"""
+	# 	"""
+	# 	self.root = root
+	# 	self.left = None
+	# 	self.right = None
+	# 	self.terminal = terminal
+	# 	self.status = True
+
+	def getRoot(self):
+		"""
+		"""
+		return self.root
+
+	def getLeft(self):
+		"""
+		"""
+		return self.left
+
+	def getRight(self):
+		"""
+		"""
+		return self.right
+
+	def isTerminal(self):
+		"""
+		"""
+		return self.status
+
+	def getTerminal(self):
+		"""
+		"""
+		return self.terminal
+
 def parser(grammar_filename, sentence):
 	"""
 	parser() takes a sentence and parses it according to the given grammar.
@@ -39,6 +90,7 @@ def cky(grammar, sentence):
 	table = [[[] for i in range(n + 1)] for j in range(n + 1)]
 	# Should we make this a dictionary? --> less memory.
 	backpointers = [[{} for i in range(n + 1)] for j in range(n + 1)]
+	nodes_back = [[[] for i in range(n + 1)] for j in range(n + 1)]
 
 	for j in range(1, n + 1):
 		# table[j - 1][j] += {A if A -> words[j] \in gram}
@@ -46,6 +98,7 @@ def cky(grammar, sentence):
 			if [sentence[j - 1]] in grammar[rule]:
 				table[j - 1][j].append(rule)
 				backpointers[j - 1][j][rule] = [rule, sentence[j - 1]]
+				nodes_back[j - 1][j].append(Node(rule, None, None, sentence[j - 1]))
 
 		# Does this actually work or do we need an 'if'?
 		for i in reversed(range(0, j - 1)): #(j - 2, 1) goes to 0
@@ -69,14 +122,22 @@ def cky(grammar, sentence):
 										[rule, backpointers[i][k][B], \
 										 backpointers[k][j][C]]
 
+								for b in nodes_back[i][k]:
+									for c in nodes_back[k][j]:
+										if b.getRoot() == B and c.getRoot() == C:
+											nodes_back[i][j].append(Node(rule, b, c, None))
+
 	
-	print(table)
-	print()
-	print(table[0][n])
-	print()
+	# print(table)
+	# print()
+	# print(table[0][n])
+	# print()
 	print(backpointers)
 	print()
 	print(backpointers[0][n]['S'])
+	print(nodes_back[0][n])
+	for node in nodes_back[0][n]:
+		print(node.isTerminal())
 	# sys.exit()
 	return backpointers[0][n]
 
@@ -92,13 +153,19 @@ def printParseTree(backpointer_dict):
 		print('The given sentence was not valid according to the grammar.')
 	else:
 		S = backpointer_dict['S']
-		print(len(S))
-		result = '(S ' + constructSubTree(S[1], 5 + len(S[1][0])) + '\n' \
-				 + ' '*3 + constructSubTree(S[2], 5 + len(S[2][0])) + ')'
-		print(result)
+		# print(len(S))
+		# result = '(S ' + constructSubTree(S[1], 5 + len(S[1][0])) + '\n' \
+		# 		 + ' '*3 + constructSubTree(S[2], 5 + len(S[2][0])) + ')'
+		print(constructSubTree(S, 3))
 
 def constructSubTree(tree, indent):
 	"""
+	constructSubTree() takes a tree and constructs the sub trees of that
+	tree. The result is a string that can be printed out to nicely show what
+	the tree looks like.
+
+	@params: a tree (root or root and subtrees) and a number to indent by.
+	@return: sub tree in the form of a string.
 	"""
 	result = ''
 	if len(tree) == 2:
@@ -107,7 +174,8 @@ def constructSubTree(tree, indent):
 			result = '(' + tree[0] + ' ' + tree[1] + ')'
 		else:
 			# Nonterminal to single nonterminal
-			result = '(' + tree[0] + ' ' + constructSubTree(tree[1]) + ')'
+			new = indent + 2 + len(tree[1][0])
+			result = '(' + tree[0] + ' ' + constructSubTree(tree[1], new) + ')'
 	else:
 		# print(tree[0])
 		# print(len(tree[0]))
