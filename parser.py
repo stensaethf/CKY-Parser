@@ -20,41 +20,95 @@ def parser(grammar_filename, sentence):
 	"""
 	grammar = getGrammar(grammar_filename)
 
-	backpointer_lst = cky(grammar, sentence)
+	backpointer_lst = cky(grammar, sentence.split())
 
 	printParseTree(backpointer_lst)
 
 def cky(grammar, sentence):
 	"""
-	ckY() takes sentence and parses it according to the provided grammar.
+	cky() takes sentence and parses it according to the provided grammar.
 
 	@parmas: grammar (dictionary),
-			 sentence (string).
+			 sentence (list of strings).
 	@return: table (results from the algorithm),
 			 backpointers for the solution.
 	"""
 	n = len(sentence)
+	print(sentence)
 	# Should we make this a dictionary? --> less memory.
-	table = [[None for i in range(n)] for j in range(n)]
+	table = [[[] for i in range(n + 1)] for j in range(n + 1)]
 	# Should we make this a dictionary? --> less memory.
-	backpointers = [[[] for i in range(n)] for j in range(n)]
+	backpointers = [[[] for i in range(n + 1)] for j in range(n + 1)]
 
-	for j in range(1, len(sentence)):
+	for j in range(1, n + 1):
 		# table[j - 1][j] += {A if A -> words[j] \in gram}
+		# print(sentence[j - 1])
+		for rule in grammar:
+			# print(rule)
+			# print(grammar[rule])
+			# print(sentence[j - 1])
+			if [sentence[j - 1]] in grammar[rule]:
+				# print('entererd')
+				# print(j)
+				table[j - 1][j].append(rule)
+
+		# print(table)
+		# sys.exit()
+
 		# Does this actually work or do we need an 'if'?
-		for i in range(j - 2, 0):
-			for k in range(i + 1, j - 1):
+		for i in reversed(range(0, j - 1)): #(j - 2, 1) goes to 0
+			# print(i)
+			# print(j)
+			# print()
+			for k in range(i + 1, j): # goes to j - 1
 				# table[i][j] += {A if A -> B C \in gram,
 				# 				  B \in table[i][k]
 				#				  C \in table[k][j]}
 
-	return backpointers[0][n - 1]
+				# print(i)
+				# print(k)
+				# print(n)
+				# print()
 
-def printParseTree(parse_tree, backpointers):
+				for rule in grammar:
+					# print()
+					# print(rule)
+					# print()
+					for derivation in grammar[rule]:
+						# print(derivation)
+						# print()
+						if len(derivation) == 2:
+							B = derivation[0]
+							C = derivation[1]
+							# print(rule)
+							# print(derivation)
+							# print(B)
+							# print(C)
+							# print(table[i][k])
+							# print(table[k][j])
+
+							if B in table[i][k] and C in table[k][j]:
+								print('entered')
+								print(rule)
+								print(B)
+								print(C)
+								if i == 0 and j == n:
+									print('ypupyupupupup')
+								print()
+								table[i][j].append(rule)
+							# print()
+	
+	print(table)
+	print(table[0][n])
+	sys.exit()
+	return backpointers[0][n]
+
+def printParseTree(backpointers):
 	"""
-	printParseTree() takes a parse tree and prints it out.
+	printParseTree() takes a parse tree in the form of a list of backpoitners
+	and prints it out.
 
-	@params: parse tree (embeded lists)
+	@params: backpointers (list of multiple lists).
 	@return: n/a.
 	"""
 	# Code
@@ -77,7 +131,7 @@ def getGrammar(grammar_filename):
 	try:
 		grammar_text = open(sys.argv[1], 'r')
 
-	except Exception,e:
+	except: #Exception,e:
 		# print e
 		printError()
 
@@ -103,7 +157,7 @@ def getGrammar(grammar_filename):
 			left_side = rule[0].split()
 			if len(left_side) != 1:
 				printError(1)
-			elif left_side[0][0] != left_side[0][0].higher():
+			elif left_side[0][0] != left_side[0][0].upper():
 				printError(1)
 
 			# If we have seen a derivation before, we add it to the list.
@@ -111,11 +165,21 @@ def getGrammar(grammar_filename):
 				if right_side in grammar[rule[0]]:
 					printError(1)
 				else:
-					grammar[rule[0]] = grammar[rule[0]].append(right_side)
+					# print('OTHER')
+					# print(grammar[rule[0]])
+					# print(right_side)
+					grammar[rule[0]].append(right_side)
 			# If we have not seen a derivation before we need to add it to
 			# the dictionary.
 			else:
+				# print('RIGHT SIDE')
+				# print(right_side)
 				grammar[rule[0]] = [right_side]
+
+		# print(grammar)
+
+	# print(grammar)
+	# sys.exit()
 
 	return grammar
 
