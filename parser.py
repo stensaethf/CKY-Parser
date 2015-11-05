@@ -137,7 +137,7 @@ def cky(grammar, sentence):
 	print(backpointers[0][n]['S'])
 	print(nodes_back[0][n])
 	for node in nodes_back[0][n]:
-		print(node.isTerminal())
+		print(node.getRoot())
 	# sys.exit()
 	return backpointers[0][n]
 
