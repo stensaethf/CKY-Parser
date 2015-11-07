@@ -48,7 +48,9 @@ def cky(grammar, sentence):
 				nodes_back[j - 1][j].append(
 					Node(rule, None, None, sentence[j - 1]))
 
-		# Does this actually work or do we need an 'if'?
+		# Loop over diagonally in the table and fill in the fields using
+		# the rules of the grammar. We check subnodes to find out whether
+		# a rule applies or not.
 		for i in reversed(range(0, j - 1)): #(j - 2, 1) goes to 0
 			for k in range(i + 1, j): # goes to j - 1
 				# table[i][j] += {A if A -> B C \in gram,
@@ -60,6 +62,8 @@ def cky(grammar, sentence):
 							B = derivation[0]
 							C = derivation[1]
 
+							# If A -> B C and B in table[i][k] and C in
+							# table[k][j].
 							if B in table[i][k] and C in table[k][j]:
 								table[i][j].append(rule)
 
@@ -102,6 +106,7 @@ def getParseTree(root, indent):
 	if root.status:
 		return '(' + root.root + ' ' + root.terminal + ')'
 
+	# Calculates the new indent factors that we need to pass forward.
 	new1 = indent + 2 + len(root.left.root) #len(tree[1][0])
 	new2 = indent + 2 + len(root.right.root) #len(tree[2][0])
 	left = getParseTree(root.left, new1)
