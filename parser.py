@@ -133,7 +133,7 @@ def getGrammar(grammar_filename):
 		grammar_text = open(sys.argv[1], 'r')
 	except: #Exception,e:
 		# print e
-		printError()
+		printError(1)
 
 	grammar = {}
 	# Loops over each line in the grammar file we were given to record the
