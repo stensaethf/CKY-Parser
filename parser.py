@@ -153,6 +153,17 @@ def getGrammar(grammar_filename):
 			right_side = rule[1].split()
 			if len(right_side) > 2:
 				printError(1)
+			elif len(right_side) == 0:
+				printError(1)
+			elif len(right_side) == 2:
+				print(right_side)
+				if right_side[0][0] == right_side[0][0].lower():
+					printError(1)
+				elif right_side[1][0] == right_side[1][0].lower():
+					printError(1)
+			else: # len(right_side) == 1
+				if right_side[0][0] == right_side[0][0].lower():
+					printError(1)
 
 			left_side = rule[0].split()
 			if len(left_side) != 1:
