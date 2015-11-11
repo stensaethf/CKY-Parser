@@ -150,10 +150,11 @@ def getGrammar(grammar_filename):
 			rule[1] = rule[1].strip()
 
 			# Makes sure the grammar is of the proper form.
+			# Right hand side needs to contain one or two elements.
+			# If two elements: neither can start with lower letter.
+			# If one element: can start with lower letter.
 			right_side = rule[1].split()
-			if len(right_side) > 2:
-				printError(1)
-			elif len(right_side) == 0:
+			if (len(right_side) > 2) or (len(right_side) == 0):
 				printError(1)
 			elif len(right_side) == 2:
 				print(right_side)
@@ -161,10 +162,12 @@ def getGrammar(grammar_filename):
 					printError(1)
 				elif right_side[1][0] == right_side[1][0].lower():
 					printError(1)
-			else: # len(right_side) == 1
-				if right_side[0][0] == right_side[0][0].lower():
-					printError(1)
+			# else: # len(right_side) == 1
+			# 	if right_side[0][0] == right_side[0][0].lower():
+			# 		printError(1)
 
+			# Left hand side can only contain one element and that element
+			# needs to be uppercase for the first letter.
 			left_side = rule[0].split()
 			if len(left_side) != 1:
 				printError(1)
