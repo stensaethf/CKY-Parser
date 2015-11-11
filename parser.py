@@ -157,7 +157,7 @@ def getGrammar(grammar_filename):
 			if (len(right_side) > 2) or (len(right_side) == 0):
 				printError(1)
 			elif len(right_side) == 2:
-				print(right_side)
+				# print(right_side)
 				if right_side[0][0] == right_side[0][0].lower():
 					printError(1)
 				elif right_side[1][0] == right_side[1][0].lower():
